@@ -1,11 +1,12 @@
-
-from sys import meta_path
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
+import pandas as pd
 
 link_movie_array=[]
+meta_data_movie=[]
+full_movie_array = []
 
 options = Options()
 options.add_experimental_option('excludeSwitches', ['enable-logging'])#con estas options evito que de error usb y bluetooth
@@ -48,14 +49,25 @@ for pelicula in link_movie_array: #recorro cada link obteniendo toda la info nec
     try:#si la sinopsis tiene el clickeable Mas intento clickearlo, si no lo tiene uso el parrafo tal cual esta en la pagina
         click_movies(path_sinop)
         sinop_movie = driver.find_element_by_xpath('//*[@id="subview-container"]/starz-movie-details/div/div/section/div[1]/div[2]/div[1]/p[1]')
+        
     except:
         sinop_movie = driver.find_element_by_xpath('//*[@id="subview-container"]/starz-movie-details/div/div/section/div[1]/div[2]/div[1]/p')
 
-    print (name_movie.text)
-    print (sinop_movie.text)
 
+    full_movie_array.append (name_movie.text[4:][:-7])#con el slice saco las palabras de mas que tiene el titulo al principio y al final
+    full_movie_array.append (sinop_movie.text)
+    
     for meta in meta_movie:
-        print(meta.text)
+        #meta_data_movie.append(meta.text)
+        full_movie_array.append(meta.text)
     
-    
+
+driver.close()
+
+df = pd.DataFrame({'full_movie_array':full_movie_array})
+print (df)
+df.to_csv('MetaDataMovies.csv', index=False)    
+
+
+
 
